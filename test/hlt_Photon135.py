@@ -5674,6 +5674,14 @@ process.hltPhoton135HEFilter = cms.EDFilter( "HLTEgammaGenericFilter",
     candTag = cms.InputTag( "hltEG135EtFilter" ),
     thrOverE2EE = cms.double( -1.0 )
 )
+
+process.hltPhotonConversionFilter = cms.EDFilter( "HLTPhotonConversionFilter",
+    saveTags = cms.bool( False ),
+    photonTag = cms.InputTag( "photons" ),
+    electronTag = cms.InputTag( "gsfElectrons" )
+)
+
+
 process.hltBoolEnd = cms.EDFilter( "HLTBool",
     result = cms.bool( True )
 )
@@ -5688,7 +5696,9 @@ process.HLTDoLocalHcalWithoutHOSequence = cms.Sequence( process.hltHcalDigis + p
 process.HLTSinglePhoton135Sequence = cms.Sequence( process.HLTDoRegionalEgammaEcalSequence + process.HLTL1SeededEcalClustersSequence + process.hltL1SeededRecoEcalCandidate + process.hltEGRegionalL1SingleEG30 + process.hltEG135EtFilter + process.HLTDoLocalHcalWithoutHOSequence + process.hltL1SeededPhotonHcalForHE + process.hltPhoton135HEFilter )
 process.HLTEndSequence = cms.Sequence( process.hltBoolEnd )
 
-process.HLT_Photon135_v7 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG30 + process.hltPrePhoton135 + process.HLTSinglePhoton135Sequence + process.HLTEndSequence )
+#process.HLT_Photon135_v7 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG30 + process.hltPrePhoton135 + process.HLTSinglePhoton135Sequence + process.HLTEndSequence )
+
+process.HLT_Photon135_v7 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG30 + process.hltPrePhoton135 + process.HLTSinglePhoton135Sequence + process.hltPhotonConversionFilter + process.HLTEndSequence )
 
 
 process.source = cms.Source( "PoolSource",
