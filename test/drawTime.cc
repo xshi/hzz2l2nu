@@ -25,15 +25,24 @@ void draw(TFile * inputFile, TString outFile) {
   gDirectory->GetObject(Form("DQMData/Run %d/HLT/Run summary/TimerService/all_paths", run_number), h1f_all_paths); 
   
   TCanvas *c = new TCanvas("c", "Time", 600, 600); 
+  c->Print(Form("%s[", outFile.Data()));
+
+
   h1f_all_paths->Draw();
+  c->Print(outFile);
+  c->Clear(); 
 
-  // gROOT->SetStyle("Plain");
+  gROOT->SetStyle("Plain");
   
-  // gStyle->SetPalette(1);
-  // gStyle->SetOptStat(0);
-  // gStyle->SetTitle(0);
+  gStyle->SetPalette(1);
+  gStyle->SetOptStat(0);
+  gStyle->SetTitle(0);
+  h1f_all_paths->Draw();
+  c->Print(outFile);
+  c->Clear(); 
+  
+  c->Print(Form("%s]", outFile.Data()));
 
-  c->SaveAs(outFile);
 }
 
 
