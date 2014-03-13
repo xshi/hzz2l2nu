@@ -7,6 +7,7 @@
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TString.h>
+#include <TH1F.h> 
 #include <TH2D.h> 
 #include <TFile.h> 
 #include <TCanvas.h> 
@@ -17,29 +18,14 @@ using namespace std;
 
 
 void draw(TFile * inputFile, TString outFile) {
+  // int run_number = get_run_number(inputFile)
+  int run_number = 207515; 
 
-  cout << outFile << endl; 
-
-  // TH2D *h3 = new TH2D("h3", "", 416, 0., 416., 160, 0., 160.);
-  // TH2D *h2d;
-  // for (int chip = 0; chip < 16 ; chip++) { 
-  //   gDirectory->GetObject(Form("DAQ/Hits_C%d_V0", chip), h2d); 
-  //   if (!h2d){
-  //     cerr << "No object name found: " << endl;
-  //     return ;
-  //   }
-    
-  //   for (int icol = 0; icol < 52; icol++) {
-  //     for (int irow = 0; irow < 80; irow++)  {
-  // 	double value = h2d->GetBinContent(icol, irow); 
-  // 	if (chip < 8) {h3->SetBinContent(415-(chip*52+icol)+1, 159-irow+1, value);}
-  // 	if (chip > 7) {h3->SetBinContent((chip-8)*52+icol+1, irow+1, value);}
-  //     }
-  //   }
-  // }
+  TH1F * h1f_all_paths = NULL; 
+  gDirectory->GetObject(Form("DQMData/Run %d/HLT/Run summary/TimerService/all_paths", run_number), h1f_all_paths); 
   
-  // TCanvas *c = new TCanvas("c", "DAQ module", 800, 200); 
-  // h3->DrawCopy("colz");
+  TCanvas *c = new TCanvas("c", "Time", 600, 600); 
+  h1f_all_paths->Draw();
 
   // gROOT->SetStyle("Plain");
   
@@ -47,7 +33,7 @@ void draw(TFile * inputFile, TString outFile) {
   // gStyle->SetOptStat(0);
   // gStyle->SetTitle(0);
 
-  // c->SaveAs(outFile);
+  c->SaveAs(outFile);
 }
 
 
