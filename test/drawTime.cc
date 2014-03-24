@@ -209,14 +209,23 @@ void draw(TString inputFile, TString outFile) {
   
   // draw zoom-in PATH time
 
-  TH1F * h1f_path = new TH1F("h", "HLT Paths time;;processing time [ms]", 5, 0, 5); 
-
-  //  TString label = "HLT_Photon135_PFMET40_v1"; 
-
-
   vector<TString> labels; 
-  labels.push_back("HLT_Photon135_PFMET40_v1"); 
+
   labels.push_back("HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+  labels.push_back("HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+  labels.push_back("HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+  labels.push_back("HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+  labels.push_back("HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+  labels.push_back("HLT_Photon135_PFMET40_v1"); 
+  labels.push_back("HLT_Photon150_PFMET40_v1"); 
+  labels.push_back("HLT_Photon160_PFMET40_v1"); 
+  labels.push_back("HLT_Photon250_NoHE_PFMET40_v1"); 
+  labels.push_back("HLT_Photon300_NoHE_PFMET40_v1"); 
+
+  // TH1F * h1f_path = new TH1F("h", "HLT Paths time;;processing time [ms]", 5, 0, 5); 
+
+  TH1F * h1f_path = new TH1F("h", "HLT Paths time;;processing time [ms]",
+			     labels.size(), 0, labels.size()); 
 
   for (vector<TString>::size_type i=0; i!= labels.size(); i++){
     
