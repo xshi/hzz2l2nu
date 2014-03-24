@@ -153,14 +153,14 @@ void setTDRStyle() {
 }
 
 
-void fill_hlt_path(TProfile *prf_paths_active_time, TString label, TH1F *h1f_path) {
+void fill_hlt_path(int i, TString label, TProfile *prf_paths_active_time, TH1F *h1f_path) {
   int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
   double content = prf_paths_active_time->GetBinContent(iBin); 
   double error = prf_paths_active_time->GetBinError(iBin); 
 
-  h1f_path->SetBinContent(1, content); 
-  h1f_path->SetBinError(1, error); 
-  h1f_path->GetXaxis()->SetBinLabel(1, label.Data()); 
+  h1f_path->SetBinContent(i+1, content); 
+  h1f_path->SetBinError(i+1, error); 
+  h1f_path->GetXaxis()->SetBinLabel(i+1, label.Data()); 
  
   // Char_t message[80];
   // sprintf(message, "T(%s) = %.4f#pm%.4f[ms] ", label.Data(), content, error); 
@@ -211,9 +211,19 @@ void draw(TString inputFile, TString outFile) {
 
   TH1F * h1f_path = new TH1F("h", "HLT Paths time;;processing time [ms]", 5, 0, 5); 
 
-  TString label = "HLT_Photon135_PFMET40_v1"; 
+  //  TString label = "HLT_Photon135_PFMET40_v1"; 
 
-  fill_hlt_path(prf_paths_active_time, label, h1f_path); 
+
+  vector<TString> labels; 
+  labels.push_back("HLT_Photon135_PFMET40_v1"); 
+  labels.push_back("HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
+
+  for (vector<TString>::size_type i=0; i!= labels.size(); i++){
+    
+    fill_hlt_path(i, labels[i], prf_paths_active_time, h1f_path); 
+    
+  }
+
 
   // int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
   // double content = prf_paths_active_time->GetBinContent(iBin); 
