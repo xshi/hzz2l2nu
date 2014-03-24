@@ -153,6 +153,21 @@ void setTDRStyle() {
 }
 
 
+void fill_hlt_path(TProfile *prf_paths_active_time, TString label, TH1F *h1f_path) {
+  int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
+  double content = prf_paths_active_time->GetBinContent(iBin); 
+  double error = prf_paths_active_time->GetBinError(iBin); 
+
+  h1f_path->SetBinContent(1, content); 
+  h1f_path->SetBinError(1, error); 
+  h1f_path->GetXaxis()->SetBinLabel(1, label.Data()); 
+ 
+  // Char_t message[80];
+  // sprintf(message, "T(%s) = %.4f#pm%.4f[ms] ", label.Data(), content, error); 
+  cout << label << ": " << content << " +/- " << error << " [ms]" << endl; 
+} 
+
+
 void draw(TString inputFile, TString outFile) {
   setTDRStyle(); 
   TFile::Open(inputFile.Data()); 
@@ -193,33 +208,44 @@ void draw(TString inputFile, TString outFile) {
   c->Clear(); 
   
   // draw zoom-in PATH time
-  TString label = "HLT_Photon135_PFMET40_v1"; 
+
   TH1F * h1f_path = new TH1F("h", "HLT Paths time;;processing time [ms]", 5, 0, 5); 
 
-  int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
-  double content = prf_paths_active_time->GetBinContent(iBin); 
-  double error = prf_paths_active_time->GetBinError(iBin); 
+  TString label = "HLT_Photon135_PFMET40_v1"; 
 
-  h1f_path->SetBinContent(1, content); 
-  h1f_path->SetBinError(1, error); 
-  h1f_path->GetXaxis()->SetBinLabel(1, label.Data()); 
+  fill_hlt_path(prf_paths_active_time, label, h1f_path); 
+
+  // int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
+  // double content = prf_paths_active_time->GetBinContent(iBin); 
+  // double error = prf_paths_active_time->GetBinError(iBin); 
+
+  // h1f_path->SetBinContent(1, content); 
+  // h1f_path->SetBinError(1, error); 
+  // h1f_path->GetXaxis()->SetBinLabel(1, label.Data()); 
+  
+  
   h1f_path->GetXaxis()->SetLabelSize(0.025); 
   h1f_path->GetYaxis()->SetTitleSize(0.04); 
   h1f_path->Draw("E"); 
 
-  TPaveText *pt = new TPaveText(0.7,0.5, 0.99, 0.75, "NDC");
-  Char_t message[80];
-  sprintf(message, "T(%s) = %.4f#pm%.4f[ms] ", label.Data(), content, error); 
-  cout << label << ": " << content << " +/- " << error << " [ms]" << endl; 
-  pt->AddText(message);  
-  pt->SetBorderSize(0);
-  pt->SetFillColor(0); 
-  pt->Draw(); 
+  // TPaveText *pt = new TPaveText(0.7,0.5, 0.99, 0.75, "NDC");
+  // Char_t message[80];
+  // sprintf(message, "T(%s) = %.4f#pm%.4f[ms] ", label.Data(), content, error); 
+  // cout << label << ": " << content << " +/- " << error << " [ms]" << endl; 
+  // pt->AddText(message);  
+
+  // pt->SetBorderSize(0);
+  // pt->SetFillColor(0); 
+  // pt->Draw(); 
 
   c->Print(outFile);
   c->Clear(); 
   h1f_path->Delete(); 
-  pt->Delete(); 
+  // pt->Delete(); 
+
+  
+
+
 
 
   c->Print(Form("%s]", outFile.Data()));
