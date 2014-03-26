@@ -167,6 +167,17 @@ void fill_hlt_path(int i, TString label, TProfile *prf_paths_active_time, TH1F *
   cout << label << ": " << content << " +/- " << error << " [ms]" << endl; 
 } 
 
+// void print_module_average(int i, TString label, TH1F * h1f_path){
+//   h1f_path = NULL; 
+//   TString hname = "all_paths"; 
+//   gDirectory->GetObject(Form("%s/%s", TimerServicePath.Data(), hname.Data()), h1f_all_paths); 
+  
+//   if (! h1f_all_paths) {
+//     cerr << "Can't find object: " << hname << endl; 
+//     return; 
+//   }
+// }
+
 
 void draw(TString inputFile, TString outFile) {
   setTDRStyle(); 
@@ -247,12 +258,20 @@ void draw(TString inputFile, TString outFile) {
   // pt->SetFillColor(0); 
   // pt->Draw(); 
 
-  // List module time larger than 0.2ms
+  // List module time larger than 0.1ms
   // for (vector<TString>::size_type i=0; i!= labels.size(); i++){
   //   print_module_average(i, labels[i], prf_paths_active_time, h1f_path); 
   // }
+  int i = 0; 
+  TString module_average_path_name = Form("%s/Paths/%s_module_active",
+					  TimerServicePath.Data(), 
+					  labels[i].Data()); 
+  cout << module_average_path_name << endl; 
   
   
+  // print_module_average(i, labels[i], prf_paths_active_time, h1f_path);   
+  
+
 
   c->Print(outFile);
   c->Clear(); 
