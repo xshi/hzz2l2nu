@@ -211,6 +211,8 @@ void draw(TString inputFile, TString outFile) {
 
   vector<TString> labels; 
 
+  // labels.push_back("HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v5");
+
   labels.push_back("HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
   labels.push_back("HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
   labels.push_back("HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1");
@@ -228,20 +230,8 @@ void draw(TString inputFile, TString outFile) {
 			     labels.size(), 0, labels.size()); 
 
   for (vector<TString>::size_type i=0; i!= labels.size(); i++){
-    
     fill_hlt_path(i, labels[i], prf_paths_active_time, h1f_path); 
-    
   }
-
-
-  // int iBin = prf_paths_active_time->GetXaxis()->FindBin(label.Data()); 
-  // double content = prf_paths_active_time->GetBinContent(iBin); 
-  // double error = prf_paths_active_time->GetBinError(iBin); 
-
-  // h1f_path->SetBinContent(1, content); 
-  // h1f_path->SetBinError(1, error); 
-  // h1f_path->GetXaxis()->SetBinLabel(1, label.Data()); 
-  
   
   h1f_path->GetXaxis()->SetLabelSize(0.025); 
   h1f_path->GetYaxis()->SetTitleSize(0.04); 
@@ -256,6 +246,13 @@ void draw(TString inputFile, TString outFile) {
   // pt->SetBorderSize(0);
   // pt->SetFillColor(0); 
   // pt->Draw(); 
+
+  // List module time larger than 0.2ms
+  // for (vector<TString>::size_type i=0; i!= labels.size(); i++){
+  //   print_module_average(i, labels[i], prf_paths_active_time, h1f_path); 
+  // }
+  
+  
 
   c->Print(outFile);
   c->Clear(); 
