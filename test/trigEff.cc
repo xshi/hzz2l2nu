@@ -23,12 +23,15 @@ void trigEff(TString inputFile, TString outFile) {
   setTDRStyle(); 
 
   cout << "inputFile: " << inputFile << endl; 
+  
+  //open the file and get events tree
+  // DataEventSummaryHandler evSummaryHandler;
+  
 
 }
 
 
 #ifndef __CINT__ 
-#include <iostream>
 #include <algorithm>
 
 char* get_option(char ** begin, char ** end, const std::string & option){
