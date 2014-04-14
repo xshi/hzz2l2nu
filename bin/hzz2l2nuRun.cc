@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
   DataEventSummaryHandler evSummaryHandler;
   TFile *file = TFile::Open(url);
   printf("Looping on %s\n",url.Data());
-  exit(0); 
+
 
   if(file==0) return -1;
   if(file->IsZombie()) return -1;
@@ -127,6 +127,8 @@ int main(int argc, char* argv[])
   //check run range to compute scale factor (if not all entries are used)
   const Int_t totalEntries= evSummaryHandler.getEntries();
   
+  cout << "total entries: " << totalEntries << endl; 
+  exit(0); 
   //MC normalization (to 1/pb)
   float cnorm=1.0;
   if(isMC){
