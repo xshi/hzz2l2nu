@@ -63,15 +63,17 @@ int main(int argc, char* argv[])
   // int mctruthmode = runProcess.getParameter<int>("mctruthmode");
 
 
-  // TString suffix=runProcess.getParameter<std::string>("suffix");
+  TString suffix=runProcess.getParameter<std::string>("suffix");
   std::vector<std::string> urls=runProcess.getParameter<std::vector<std::string> >("input");
   TString url=TString(urls[0]);
-  // TString outFileUrl(gSystem->BaseName(url)); 
-  // outFileUrl.ReplaceAll(".root",""); 
-  // outFileUrl+=suffix;
+  TString outFileUrl(gSystem->BaseName(url)); 
+  outFileUrl.ReplaceAll(".root",""); 
+
+  outFileUrl+=suffix;
   // if(mctruthmode!=0) { outFileUrl += "_filt"; outFileUrl += mctruthmode; }
   TString outdir=runProcess.getParameter<std::string>("outdir");
   TString outUrl( outdir );
+  
   gSystem->Exec("mkdir -p " + outUrl);
 
   // TString outTxtUrl= outUrl + "/" + outFileUrl + ".txt";
@@ -181,7 +183,7 @@ int main(int argc, char* argv[])
   higgs::utils::EventCategory eventCategoryInst(higgs::utils::EventCategory::EXCLUSIVE2JETSVBF); //jet(0,>=1)+vbf binning
 
   
-  cout << "here: " << endl; exit(0); 
+  
   //##############################################
   //########           EVENT LOOP         ########
   //##############################################
@@ -191,6 +193,8 @@ int main(int argc, char* argv[])
   int treeStep(totalEntries/50);
   DuplicatesChecker duplicatesChecker;
   int nDuplicates(0);
+
+  
   for( int iev=0; iev<totalEntries; iev++){
       if(iev%treeStep==0){printf(".");fflush(stdout);}
 
@@ -212,7 +216,7 @@ int main(int argc, char* argv[])
       // bool muTrigger          = ev.t_bits[6];
       bool mumuTrigger        = ev.t_bits[2] || ev.t_bits[3]; 
       bool emuTrigger         = ev.t_bits[4] || ev.t_bits[5];
-
+      
       bool hasPhotonTrigger(false);
       float triggerPrescale(1.0),triggerThreshold(0);
       // bool runPhotonSelection(mctruthmode==22 || mctruthmode==111);
@@ -232,6 +236,7 @@ int main(int argc, char* argv[])
 	      break;
 	    }
 	}
+
 
       
       //
@@ -312,6 +317,7 @@ int main(int argc, char* argv[])
 	}
 
 
+
       //
       // LEPTON ANALYSIS
       //
@@ -324,6 +330,8 @@ int main(int argc, char* argv[])
 
 	  int lid=leptons[ilep].get("id");
 
+	  
+	  // cout << "here: " << lid << endl; exit(0); 
 	  //apply muon corrections
 	  if(abs(lid)==13)
 	    {
@@ -815,7 +823,7 @@ int main(int argc, char* argv[])
   //##############################################
   //save control plots to file
   outUrl += "/";
-  // outUrl += outFileUrl + ".root";
+  outUrl += outFileUrl + ".root";
   printf("Results save in %s\n", outUrl.Data());
   
   //save all to the file
