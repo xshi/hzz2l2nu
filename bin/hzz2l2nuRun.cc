@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
   const Int_t totalEntries= evSummaryHandler.getEntries();
   
   cout << "total entries: " << totalEntries << endl; 
-  exit(0); 
+
   //MC normalization (to 1/pb)
   float cnorm=1.0;
   if(isMC){
@@ -138,17 +138,18 @@ int main(int argc, char* argv[])
   }
   Hcutflow->SetBinContent(1,cnorm);
 
+
   //jet energy scale and uncertainties 
-  TString jecDir = runProcess.getParameter<std::string>("jecDir");
-  gSystem->ExpandPathName(jecDir);
-  FactorizedJetCorrector *jesCor        = utils::cmssw::getJetCorrector(jecDir,isMC);
-  JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt").Data());
+  // TString jecDir = runProcess.getParameter<std::string>("jecDir");
+  // gSystem->ExpandPathName(jecDir);
+  // FactorizedJetCorrector *jesCor        = utils::cmssw::getJetCorrector(jecDir,isMC);
+  // JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt").Data());
   
   //muon energy scale and uncertainties
-  MuScleFitCorrector *muCor=getMuonCorrector(jecDir,url);
+  // MuScleFitCorrector *muCor=getMuonCorrector(jecDir,url);
 
   //lepton efficiencies
-  LeptonEfficiencySF lepEff;
+  //LeptonEfficiencySF lepEff;
 
   //b-tagging: beff and leff must be derived from the MC sample using the discriminator vs flavor
   //the scale factors are taken as average numbers from the pT dependent curves see:
@@ -158,28 +159,29 @@ int main(int argc, char* argv[])
   float leff(0.13), sfl(1.05); // , sflunc(0.12);
 
   //pileup weighting
-  std::vector<double> dataPileupDistributionDouble = runProcess.getParameter< std::vector<double> >("datapileup");
-  std::vector<float> dataPileupDistribution; for(unsigned int i=0;i<dataPileupDistributionDouble.size();i++){dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);}
-  std::vector<float> mcPileupDistribution;
-  if(isMC){
-    TString puDist(dirname+"/pileup");
-    TH1F* histo = (TH1F *) file->Get(puDist);
-    if(!histo) std::cout<<"pileup histogram is null!!!\n";
-    for(int i=1;i<=histo->GetNbinsX();i++){mcPileupDistribution.push_back(histo->GetBinContent(i));}
-    delete histo;
-  }
-  while(mcPileupDistribution.size()<dataPileupDistribution.size())  mcPileupDistribution.push_back(0.0);
-  while(mcPileupDistribution.size()>dataPileupDistribution.size())dataPileupDistribution.push_back(0.0);
+  // std::vector<double> dataPileupDistributionDouble = runProcess.getParameter< std::vector<double> >("datapileup");
+  // std::vector<float> dataPileupDistribution; for(unsigned int i=0;i<dataPileupDistributionDouble.size();i++){dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);}
+  // std::vector<float> mcPileupDistribution;
+  // if(isMC){
+  //   TString puDist(dirname+"/pileup");
+  //   TH1F* histo = (TH1F *) file->Get(puDist);
+  //   if(!histo) std::cout<<"pileup histogram is null!!!\n";
+  //   for(int i=1;i<=histo->GetNbinsX();i++){mcPileupDistribution.push_back(histo->GetBinContent(i));}
+  //   delete histo;
+  // }
+  // while(mcPileupDistribution.size()<dataPileupDistribution.size())  mcPileupDistribution.push_back(0.0);
+  // while(mcPileupDistribution.size()>dataPileupDistribution.size())dataPileupDistribution.push_back(0.0);
   
   gROOT->cd();  //THIS LINE IS NEEDED TO MAKE SURE THAT HISTOGRAM INTERNALLY PRODUCED IN LumiReWeighting ARE NOT DESTROYED WHEN CLOSING THE FILE
-  edm::LumiReWeighting *LumiWeights= isMC ? new edm::LumiReWeighting(mcPileupDistribution,dataPileupDistribution): 0;
-  utils::cmssw::PuShifter_t PuShifters;
-  if(isMC) { PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution,0.05); }
+  // edm::LumiReWeighting *LumiWeights= isMC ? new edm::LumiReWeighting(mcPileupDistribution,dataPileupDistribution): 0;
+  // utils::cmssw::PuShifter_t PuShifters;
+  // if(isMC) { PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution,0.05); }
 
 
   higgs::utils::EventCategory eventCategoryInst(higgs::utils::EventCategory::EXCLUSIVE2JETSVBF); //jet(0,>=1)+vbf binning
 
-
+  
+  cout << "here: " << endl; exit(0); 
   //##############################################
   //########           EVENT LOOP         ########
   //##############################################
@@ -241,12 +243,12 @@ int main(int argc, char* argv[])
       double TotalWeight_plus = 1.0;
       double TotalWeight_minus = 1.0;
       float puWeight(1.0);
-      if(isMC){
-        puWeight          = LumiWeights->weight(ev.ngenITpu);
-	weight            = puWeight;
-        TotalWeight_plus  = PuShifters[utils::cmssw::PUUP]->Eval(ev.ngenITpu);
-        TotalWeight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(ev.ngenITpu);
-      }
+      // if(isMC){
+      // 	puWeight          = LumiWeights->weight(ev.ngenITpu);
+      // 	weight            = puWeight;
+      //   TotalWeight_plus  = PuShifters[utils::cmssw::PUUP]->Eval(ev.ngenITpu);
+      //   TotalWeight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(ev.ngenITpu);
+      // }
 
       Hcutflow->Fill(1,1);
       Hcutflow->Fill(2,weight);
@@ -326,14 +328,14 @@ int main(int argc, char* argv[])
 	  if(abs(lid)==13)
 	    {
 	      passSoftMuon=false;
-	      if(muCor){
-		TLorentzVector p4(leptons[ilep].px(),leptons[ilep].py(),leptons[ilep].pz(),leptons[ilep].energy());
-		muCor->applyPtCorrection(p4 , lid<0 ? -1 :1 );
-		if(isMC) muCor->applyPtSmearing(p4, lid<0 ? -1 : 1, false);
-		muDiff -= leptons[ilep];
-		leptons[ilep].SetPxPyPzE(p4.Px(),p4.Py(),p4.Pz(),p4.E());
-		muDiff += leptons[ilep];
-	      }
+	      // if(muCor){
+	      // 	TLorentzVector p4(leptons[ilep].px(),leptons[ilep].py(),leptons[ilep].pz(),leptons[ilep].energy());
+	      // 	muCor->applyPtCorrection(p4 , lid<0 ? -1 :1 );
+	      // 	if(isMC) muCor->applyPtSmearing(p4, lid<0 ? -1 : 1, false);
+	      // 	muDiff -= leptons[ilep];
+	      // 	leptons[ilep].SetPxPyPzE(p4.Px(),p4.Py(),p4.Pz(),p4.E());
+	      // 	muDiff += leptons[ilep];
+	      //}
 	    }
 
 	  //no need for charge info any longer
@@ -411,7 +413,7 @@ int main(int argc, char* argv[])
       //JET/MET ANALYSIS
       //
       //add scale/resolution uncertainties and propagate to the MET
-      utils::cmssw::updateJEC(jets,jesCor,totalJESUnc,ev.rho,ev.nvtx,isMC);
+      //utils::cmssw::updateJEC(jets,jesCor,totalJESUnc,ev.rho,ev.nvtx,isMC);
       std::vector<LorentzVector> met=utils::cmssw::getMETvariations(recoMet[0],jets,selLeptons,isMC);
 
       //select the jets
@@ -478,18 +480,17 @@ int main(int argc, char* argv[])
       LorentzVector boson(0,0,0,0);
       if(!runPhotonSelection && selLeptons.size()==2)
 	{
- 	  for(size_t ilep=0; ilep<2; ilep++)
-	    {
-	      dilId *= selLeptons[ilep].get("id");
-	      int id(abs(selLeptons[ilep].get("id")));
-	      weight *= isMC ? lepEff.getLeptonEfficiency( selLeptons[ilep].pt(), selLeptons[ilep].eta(), id,  id ==11 ? "loose" : "loose" ).first : 1.0;
-	      boson += selLeptons[ilep];
-	    }
-     
-	  //check the channel
-	  if( abs(dilId)==121 && eeTrigger)   chTags.push_back("ee");
-	  if( abs(dilId)==169 && mumuTrigger) chTags.push_back("mumu"); 
-	  if( abs(dilId)==143 && emuTrigger) chTags.push_back("emu"); 
+ 	  // for(size_t ilep=0; ilep<2; ilep++)
+	  //   {
+	  //     dilId *= selLeptons[ilep].get("id");
+	  //     int id(abs(selLeptons[ilep].get("id")));
+	  // weight *= isMC ? lepEff.getLeptonEfficiency( selLeptons[ilep].pt(), selLeptons[ilep].eta(), id,  id ==11 ? "loose" : "loose" ).first : 1.0;
+	  //     boson += selLeptons[ilep];
+	  //   }
+     	  // //check the channel
+	  // if( abs(dilId)==121 && eeTrigger)   chTags.push_back("ee");
+	  // if( abs(dilId)==169 && mumuTrigger) chTags.push_back("mumu"); 
+	  // if( abs(dilId)==143 && emuTrigger) chTags.push_back("emu"); 
 	}
       else{
 	if(hasPhotonTrigger && selPhotons.size()) {
