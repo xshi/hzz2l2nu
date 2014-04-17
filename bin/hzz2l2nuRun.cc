@@ -112,6 +112,17 @@ int main(int argc, char* argv[])
   mon.addHistogram( new TH1F( "nvtxraw",";Vertices;Events",50,0,50) ); 
   mon.addHistogram( new TH1F( "rho",";#rho;Events",50,0,25) ); 
 
+  // trigger paths
+  vector<string> triggerPaths = runProcess.getParameter<vector<string> >("triggerPaths");
+
+  // const int NBINS = 3; 
+
+  // TH1D *h_total = new TH1D("h_total","total", NBINS, 0, NBINS);   
+  // TH1D *h_pass = new TH1D("h_pass","pass", NBINS, 0, NBINS);
+
+  int n_trig_8_total = 0; 
+  int n_trig_8_pass = 0; 
+
   //##############################################
   //######## GET READY FOR THE EVENT LOOP ########
   //##############################################
@@ -216,6 +227,13 @@ int main(int argc, char* argv[])
       // bool muTrigger          = ev.t_bits[6];
       bool mumuTrigger        = ev.t_bits[2] || ev.t_bits[3]; 
       bool emuTrigger         = ev.t_bits[4] || ev.t_bits[5];
+      
+
+      // fill the total triggers before selection
+      //  'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v', itrig = 8 
+      const int NTRIG = 8; 
+      
+      if (ev.t_bits[NTRIG]) n_trig_8_total += 1; // h_total->Fill(1); 
       
       bool hasPhotonTrigger(false);
       float triggerPrescale(1.0),triggerThreshold(0);
@@ -526,6 +544,15 @@ int main(int argc, char* argv[])
       bool passThirdLeptonVeto( selLeptons.size()==2 && extraLeptons.size()==0 );
       bool passBtags(nbtags==0);
       bool passMinDphijmet( njets==0 || mindphijmet>0.5);
+
+
+      // passed photon + jet trigger study
+
+      // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
+      if ( passQt) //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
+	n_trig_8_pass += 1; 
+
+
       if(runPhotonSelection)
 	{
 	  passMass=hasPhotonTrigger;
@@ -636,7 +663,11 @@ int main(int argc, char* argv[])
 		    mon.fillHisto( "mtNM1",icat,mt,iweight,true);
 		    mon.fillHisto( "balanceNM1",icat,met[0].pt()/iboson.pt(),iweight);
 		    mon.fillHisto( "axialmetNM1",icat,axialMet,iweight);
+
+
+
 		  }
+
 		  if(mt>500){
 		    mon.fillHisto( "metNM1",icat,met[0].pt(),iweight,true);
 		  }
@@ -829,8 +860,12 @@ int main(int argc, char* argv[])
   //save all to the file
   TFile *ofile=TFile::Open(outUrl, "recreate");
   mon.Write();
+
   ofile->Close();
 
+  cout << "N tot = " << n_trig_8_total 
+       << " ,  N pass = " << n_trig_8_pass << endl; 
+  
   // if(outTxtFile)fclose(outTxtFile);
 }  
 
