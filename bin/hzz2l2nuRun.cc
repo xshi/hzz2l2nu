@@ -30,7 +30,8 @@
 #include "TProfile.h"
 #include "TEventList.h"
 #include "TROOT.h"
- 
+#include "TEfficiency.h" 
+
 using namespace std;
 
 TString getJetRegion(float eta)
@@ -853,7 +854,19 @@ int main(int argc, char* argv[])
   printf("\n"); 
   file->Close();
   
-  
+  // Make efficiency histo
+
+  TEfficiency* trig_eff = new TEfficiency("eff", ";Trigger Paths;Efficiency", 
+					  trigs.size(), 0, trigs.size());
+  for (unsigned int bin=1; bin<=trigs.size(); bin++) {
+    int iTotal = h_total->GetBinContent(bin); 
+    int iPass = h_pass->GetBinContent(bin); 
+    
+    if (iPass  == 0 ) continue; 
+
+    trig_eff->SetTotalEvents(bin, iTotal); 
+    trig_eff->SetPassedEvents(bin, iPass); 
+  }
 
   //##############################################
   //########     SAVING HISTO TO FILE     ########
@@ -869,6 +882,8 @@ int main(int argc, char* argv[])
 
   h_total->Write(); 
   h_pass->Write(); 
+  trig_eff->Write(); 
+
   ofile->Close();
 
   cout << "N tot = " << n_trig_8_total 
