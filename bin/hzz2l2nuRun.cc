@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
   // const int ntrigs = trigs.size(); 
 
   TH1D *h_total = new TH1D("h_total","total", trigs.size(), 0, trigs.size());   
-  // TH1D *h_pass = new TH1D("h_pass","pass", NBINS, 0, NBINS);
+  TH1D *h_pass = new TH1D("h_pass","pass", trigs.size(), 0, trigs.size());
 
   int n_trig_8_total = 0; 
   int n_trig_8_pass = 0; 
@@ -552,9 +552,10 @@ int main(int argc, char* argv[])
       // passed photon + jet trigger study
 
       // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
-      if ( passQt) //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
+      if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
 	n_trig_8_pass += 1; 
-
+	h_pass->Fill(NTRIG); 
+      }
 
       if(runPhotonSelection)
 	{
@@ -852,6 +853,8 @@ int main(int argc, char* argv[])
   printf("\n"); 
   file->Close();
   
+  
+
   //##############################################
   //########     SAVING HISTO TO FILE     ########
   //##############################################
@@ -865,7 +868,7 @@ int main(int argc, char* argv[])
   mon.Write();
 
   h_total->Write(); 
-
+  h_pass->Write(); 
   ofile->Close();
 
   cout << "N tot = " << n_trig_8_total 
