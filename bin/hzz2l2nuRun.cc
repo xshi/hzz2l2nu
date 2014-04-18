@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
   SmartSelectionMonitor mon;
 
   //generator level control : add an underflow entry to make sure the histo is kept
-  mon.addHistogram( new TH1F( "wdecays",     ";W decay channel",5,0,5) );
-  mon.addHistogram( new TH1F( "zdecays",     ";Z decay channel",6,0,6) );
+  // mon.addHistogram( new TH1F( "wdecays",     ";W decay channel",5,0,5) );
+  // mon.addHistogram( new TH1F( "zdecays",     ";Z decay channel",6,0,6) );
 
   //event selection
   TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,6,0,6) ) ;
@@ -858,14 +858,19 @@ int main(int argc, char* argv[])
 
   TEfficiency* trig_eff = new TEfficiency("eff", ";Trigger Paths;Efficiency", 
 					  trigs.size(), 0, trigs.size());
-  for (unsigned int bin=1; bin<=trigs.size(); bin++) {
-    int iTotal = h_total->GetBinContent(bin); 
-    int iPass = h_pass->GetBinContent(bin); 
-    
+  for (size_t itrig=1; itrig<=trigs.size(); itrig++) {
+    int iTotal = h_total->GetBinContent(itrig); 
+    int iPass = h_pass->GetBinContent(itrig); 
     if (iPass  == 0 ) continue; 
+    trig_eff->SetTotalEvents(itrig, iTotal); 
+    trig_eff->SetPassedEvents(itrig, iPass); 
 
-    trig_eff->SetTotalEvents(bin, iTotal); 
-    trig_eff->SetPassedEvents(bin, iPass); 
+
+    printf("Trig eff %s : %f \n", trigs[itrig].c_str(), 
+	   trig_eff->GetEfficiency(itrig)); 
+
+    // trig_eff->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
+
   }
 
   //##############################################
