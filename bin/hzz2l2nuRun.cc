@@ -113,11 +113,11 @@ int main(int argc, char* argv[])
   mon.addHistogram( new TH1F( "rho",";#rho;Events",50,0,25) ); 
 
   // trigger paths
-  vector<string> triggerPaths = runProcess.getParameter<vector<string> >("triggerPaths");
+  vector<string> trigs = runProcess.getParameter<vector<string> >("triggerPaths");
 
-  // const int NBINS = 3; 
+  // const int ntrigs = trigs.size(); 
 
-  // TH1D *h_total = new TH1D("h_total","total", NBINS, 0, NBINS);   
+  TH1D *h_total = new TH1D("h_total","total", trigs.size(), 0, trigs.size());   
   // TH1D *h_pass = new TH1D("h_pass","pass", NBINS, 0, NBINS);
 
   int n_trig_8_total = 0; 
@@ -233,7 +233,10 @@ int main(int argc, char* argv[])
       //  'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v', itrig = 8 
       const int NTRIG = 8; 
       
-      if (ev.t_bits[NTRIG]) n_trig_8_total += 1; // h_total->Fill(1); 
+      if (ev.t_bits[NTRIG]) {
+	n_trig_8_total += 1; 
+	h_total->Fill(NTRIG); 
+      }
       
       bool hasPhotonTrigger(false);
       float triggerPrescale(1.0),triggerThreshold(0);
@@ -860,6 +863,8 @@ int main(int argc, char* argv[])
   //save all to the file
   TFile *ofile=TFile::Open(outUrl, "recreate");
   mon.Write();
+
+  h_total->Write(); 
 
   ofile->Close();
 
