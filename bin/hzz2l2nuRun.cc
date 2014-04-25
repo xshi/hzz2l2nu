@@ -121,8 +121,8 @@ int main(int argc, char* argv[])
   TH1D *h_total = new TH1D("h_total","total", trigs.size(), 0, trigs.size());   
   TH1D *h_pass = new TH1D("h_pass","pass", trigs.size(), 0, trigs.size());
 
-  int n_trig_8_total = 0; 
-  int n_trig_8_pass = 0; 
+  // int n_trig_8_total = 0; 
+  // int n_trig_8_pass = 0; 
 
   //##############################################
   //######## GET READY FOR THE EVENT LOOP ########
@@ -232,12 +232,15 @@ int main(int argc, char* argv[])
 
       // fill the total triggers before selection
       //  'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v', itrig = 8 
-      const int NTRIG = 8; 
+      // const int NTRIG = 8; 
       
-      if (ev.t_bits[NTRIG]) {
-	n_trig_8_total += 1; 
-	h_total->Fill(NTRIG); 
+      for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	if (ev.t_bits[itrig]) {
+	  // n_trig_8_total += 1; 
+	  h_total->Fill(itrig); 
+	}
       }
+
       
       bool hasPhotonTrigger(false);
       float triggerPrescale(1.0),triggerThreshold(0);
@@ -553,9 +556,14 @@ int main(int argc, char* argv[])
       // passed photon + jet trigger study
 
       // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
+
+      
       if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
-	n_trig_8_pass += 1; 
-	h_pass->Fill(NTRIG); 
+
+	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	  // n_trig_8_pass += 1; 
+	  h_pass->Fill(itrig);
+	}
       }
 
       if(runPhotonSelection)
@@ -891,8 +899,8 @@ int main(int argc, char* argv[])
 
   ofile->Close();
 
-  cout << "N tot = " << n_trig_8_total 
-       << " ,  N pass = " << n_trig_8_pass << endl; 
+  // cout << "N tot = " << n_trig_8_total 
+  //      << " ,  N pass = " << n_trig_8_pass << endl; 
   
   // if(outTxtFile)fclose(outTxtFile);
 }  
