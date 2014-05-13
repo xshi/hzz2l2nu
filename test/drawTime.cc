@@ -1,7 +1,7 @@
 // 
 // Author: Xin Shi <Xin.Shi@cern.ch> 
-// 2014.03.13
-// 
+// Date: 2014.03.13
+// Version: 1.0 
 
 #include <iostream>
 #include <TROOT.h>
