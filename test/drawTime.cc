@@ -1,7 +1,7 @@
 // 
 // Author: Xin Shi <Xin.Shi@cern.ch> 
 // Date: 2014.03.13
-// Version: 1.0 
+// Version: 1.1 
 
 #include <iostream>
 #include <TROOT.h>
@@ -64,7 +64,8 @@ void draw(TString inputFile, TString outFile) {
   // int run_number = get_run_number(inputFile)
   int run_number = 207515; 
 
-  TString TimerServicePath = Form("DQMData/Run %d/HLT/Run summary/TimerService", run_number); 
+  // TString TimerServicePath = Form("DQMData/Run %d/HLT/Run summary/TimerService", run_number); 
+  TString TimerServicePath = Form("DQMData/Run %d/HLT/Run summary/TimerService/process HLTX", run_number); 
   
   TCanvas *c = new TCanvas(); 
   c->Print(Form("%s[", outFile.Data()));
