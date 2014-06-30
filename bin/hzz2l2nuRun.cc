@@ -118,6 +118,8 @@ int main(int argc, char* argv[])
 
   // const int ntrigs = trigs.size(); 
 
+  cout << ">>> total number of trigs: " << trigs.size() << endl;
+
   TH1D *h_total = new TH1D("h_total","total", trigs.size(), 0, trigs.size());   
   TH1D *h_pass = new TH1D("h_pass","pass", trigs.size(), 0, trigs.size());
 
@@ -233,11 +235,15 @@ int main(int argc, char* argv[])
       // fill the total triggers before selection
       //  'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v', itrig = 8 
       // const int NTRIG = 8; 
+
+      // cout << ">>>> last trigger bit: " << ev.t_bits[trigs.size()-1] << endl; 
       
       for(size_t itrig=0; itrig<trigs.size(); itrig++) {
 	if (ev.t_bits[itrig]) {
 	  // n_trig_8_total += 1; 
-	  h_total->Fill(itrig); 
+	  h_total->Fill(itrig+1);
+
+	  // if (itrig == 15 ) cout << ">>> last one triggered! " << endl; 
 	}
       }
 
@@ -543,6 +549,10 @@ int main(int argc, char* argv[])
 	tags.push_back( chTags[ich]+evCat );
       }
 
+      for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+      }
+      
       //
       // BASELINE SELECTION
       //
@@ -558,13 +568,14 @@ int main(int argc, char* argv[])
       // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
 
       
-      if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
+      // if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
+      // if ( true) {
 
-	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
-	  // n_trig_8_pass += 1; 
-	  h_pass->Fill(itrig);
-	}
-      }
+      // 	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+      // 	  // n_trig_8_pass += 1; 
+      // 	  if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+      // 	}
+      // }
 
       if(runPhotonSelection)
 	{
@@ -866,21 +877,20 @@ int main(int argc, char* argv[])
 
   TEfficiency* trig_eff = new TEfficiency("eff", ";Trigger Paths;Efficiency", 
 					  trigs.size(), 0, trigs.size());
-  for (size_t itrig=1; itrig<=trigs.size(); itrig++) {
-    int iTotal = h_total->GetBinContent(itrig); 
-    int iPass = h_pass->GetBinContent(itrig); 
+  for (size_t itrig = 0; itrig<trigs.size(); itrig++) {
+    int iTotal = h_total->GetBinContent(itrig+1); 
+    int iPass = h_pass->GetBinContent(itrig+1); 
     if (iPass  == 0 ) continue; 
-    trig_eff->SetTotalEvents(itrig, iTotal); 
-    trig_eff->SetPassedEvents(itrig, iPass); 
-
+    trig_eff->SetTotalEvents(itrig+1, iTotal); 
+    trig_eff->SetPassedEvents(itrig+1, iPass); 
 
     printf("Trig eff %s : %f \n", trigs[itrig].c_str(), 
-	   trig_eff->GetEfficiency(itrig)); 
+	   trig_eff->GetEfficiency(itrig+1)); 
 
     // trig_eff->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
 
   }
-
+   
   //##############################################
   //########     SAVING HISTO TO FILE     ########
   //##############################################
@@ -895,7 +905,7 @@ int main(int argc, char* argv[])
 
   h_total->Write(); 
   h_pass->Write(); 
-  trig_eff->Write(); 
+  // trig_eff->Write(); 
 
   ofile->Close();
 
