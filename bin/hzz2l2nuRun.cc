@@ -30,7 +30,8 @@
 #include "TProfile.h"
 #include "TEventList.h"
 #include "TROOT.h"
- 
+#include "TEfficiency.h" 
+
 using namespace std;
 
 TString getJetRegion(float eta)
@@ -63,15 +64,17 @@ int main(int argc, char* argv[])
   // int mctruthmode = runProcess.getParameter<int>("mctruthmode");
 
 
-  // TString suffix=runProcess.getParameter<std::string>("suffix");
+  TString suffix=runProcess.getParameter<std::string>("suffix");
   std::vector<std::string> urls=runProcess.getParameter<std::vector<std::string> >("input");
   TString url=TString(urls[0]);
-  // TString outFileUrl(gSystem->BaseName(url)); 
-  // outFileUrl.ReplaceAll(".root",""); 
-  // outFileUrl+=suffix;
+  TString outFileUrl(gSystem->BaseName(url)); 
+  outFileUrl.ReplaceAll(".root",""); 
+
+  outFileUrl+=suffix;
   // if(mctruthmode!=0) { outFileUrl += "_filt"; outFileUrl += mctruthmode; }
   TString outdir=runProcess.getParameter<std::string>("outdir");
   TString outUrl( outdir );
+  
   gSystem->Exec("mkdir -p " + outUrl);
 
   // TString outTxtUrl= outUrl + "/" + outFileUrl + ".txt";
@@ -91,8 +94,8 @@ int main(int argc, char* argv[])
   SmartSelectionMonitor mon;
 
   //generator level control : add an underflow entry to make sure the histo is kept
-  mon.addHistogram( new TH1F( "wdecays",     ";W decay channel",5,0,5) );
-  mon.addHistogram( new TH1F( "zdecays",     ";Z decay channel",6,0,6) );
+  // mon.addHistogram( new TH1F( "wdecays",     ";W decay channel",5,0,5) );
+  // mon.addHistogram( new TH1F( "zdecays",     ";Z decay channel",6,0,6) );
 
   //event selection
   TH1F* Hcutflow  = (TH1F*) mon.addHistogram(  new TH1F ("cutflow"    , "cutflow"    ,6,0,6) ) ;
@@ -109,6 +112,19 @@ int main(int argc, char* argv[])
   mon.addHistogram( new TH1F( "nvtx",";Vertices;Events",50,0,50) ); 
   mon.addHistogram( new TH1F( "nvtxraw",";Vertices;Events",50,0,50) ); 
   mon.addHistogram( new TH1F( "rho",";#rho;Events",50,0,25) ); 
+
+  // trigger paths
+  vector<string> trigs = runProcess.getParameter<vector<string> >("triggerPaths");
+
+  // const int ntrigs = trigs.size(); 
+
+  cout << ">>> total number of trigs: " << trigs.size() << endl;
+
+  TH1D *h_total = new TH1D("h_total","total", trigs.size(), 0, trigs.size());   
+  TH1D *h_pass = new TH1D("h_pass","pass", trigs.size(), 0, trigs.size());
+
+  // int n_trig_8_total = 0; 
+  // int n_trig_8_pass = 0; 
 
   //##############################################
   //######## GET READY FOR THE EVENT LOOP ########
@@ -128,7 +144,7 @@ int main(int argc, char* argv[])
   const Int_t totalEntries= evSummaryHandler.getEntries();
   
   cout << "total entries: " << totalEntries << endl; 
-  exit(0); 
+
   //MC normalization (to 1/pb)
   float cnorm=1.0;
   if(isMC){
@@ -138,17 +154,18 @@ int main(int argc, char* argv[])
   }
   Hcutflow->SetBinContent(1,cnorm);
 
+
   //jet energy scale and uncertainties 
-  TString jecDir = runProcess.getParameter<std::string>("jecDir");
-  gSystem->ExpandPathName(jecDir);
-  FactorizedJetCorrector *jesCor        = utils::cmssw::getJetCorrector(jecDir,isMC);
-  JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt").Data());
+  // TString jecDir = runProcess.getParameter<std::string>("jecDir");
+  // gSystem->ExpandPathName(jecDir);
+  // FactorizedJetCorrector *jesCor        = utils::cmssw::getJetCorrector(jecDir,isMC);
+  // JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt").Data());
   
   //muon energy scale and uncertainties
-  MuScleFitCorrector *muCor=getMuonCorrector(jecDir,url);
+  // MuScleFitCorrector *muCor=getMuonCorrector(jecDir,url);
 
   //lepton efficiencies
-  LeptonEfficiencySF lepEff;
+  //LeptonEfficiencySF lepEff;
 
   //b-tagging: beff and leff must be derived from the MC sample using the discriminator vs flavor
   //the scale factors are taken as average numbers from the pT dependent curves see:
@@ -158,28 +175,29 @@ int main(int argc, char* argv[])
   float leff(0.13), sfl(1.05); // , sflunc(0.12);
 
   //pileup weighting
-  std::vector<double> dataPileupDistributionDouble = runProcess.getParameter< std::vector<double> >("datapileup");
-  std::vector<float> dataPileupDistribution; for(unsigned int i=0;i<dataPileupDistributionDouble.size();i++){dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);}
-  std::vector<float> mcPileupDistribution;
-  if(isMC){
-    TString puDist(dirname+"/pileup");
-    TH1F* histo = (TH1F *) file->Get(puDist);
-    if(!histo) std::cout<<"pileup histogram is null!!!\n";
-    for(int i=1;i<=histo->GetNbinsX();i++){mcPileupDistribution.push_back(histo->GetBinContent(i));}
-    delete histo;
-  }
-  while(mcPileupDistribution.size()<dataPileupDistribution.size())  mcPileupDistribution.push_back(0.0);
-  while(mcPileupDistribution.size()>dataPileupDistribution.size())dataPileupDistribution.push_back(0.0);
+  // std::vector<double> dataPileupDistributionDouble = runProcess.getParameter< std::vector<double> >("datapileup");
+  // std::vector<float> dataPileupDistribution; for(unsigned int i=0;i<dataPileupDistributionDouble.size();i++){dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);}
+  // std::vector<float> mcPileupDistribution;
+  // if(isMC){
+  //   TString puDist(dirname+"/pileup");
+  //   TH1F* histo = (TH1F *) file->Get(puDist);
+  //   if(!histo) std::cout<<"pileup histogram is null!!!\n";
+  //   for(int i=1;i<=histo->GetNbinsX();i++){mcPileupDistribution.push_back(histo->GetBinContent(i));}
+  //   delete histo;
+  // }
+  // while(mcPileupDistribution.size()<dataPileupDistribution.size())  mcPileupDistribution.push_back(0.0);
+  // while(mcPileupDistribution.size()>dataPileupDistribution.size())dataPileupDistribution.push_back(0.0);
   
   gROOT->cd();  //THIS LINE IS NEEDED TO MAKE SURE THAT HISTOGRAM INTERNALLY PRODUCED IN LumiReWeighting ARE NOT DESTROYED WHEN CLOSING THE FILE
-  edm::LumiReWeighting *LumiWeights= isMC ? new edm::LumiReWeighting(mcPileupDistribution,dataPileupDistribution): 0;
-  utils::cmssw::PuShifter_t PuShifters;
-  if(isMC) { PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution,0.05); }
+  // edm::LumiReWeighting *LumiWeights= isMC ? new edm::LumiReWeighting(mcPileupDistribution,dataPileupDistribution): 0;
+  // utils::cmssw::PuShifter_t PuShifters;
+  // if(isMC) { PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution,0.05); }
 
 
   higgs::utils::EventCategory eventCategoryInst(higgs::utils::EventCategory::EXCLUSIVE2JETSVBF); //jet(0,>=1)+vbf binning
 
-
+  
+  
   //##############################################
   //########           EVENT LOOP         ########
   //##############################################
@@ -189,6 +207,8 @@ int main(int argc, char* argv[])
   int treeStep(totalEntries/50);
   DuplicatesChecker duplicatesChecker;
   int nDuplicates(0);
+
+  
   for( int iev=0; iev<totalEntries; iev++){
       if(iev%treeStep==0){printf(".");fflush(stdout);}
 
@@ -210,7 +230,24 @@ int main(int argc, char* argv[])
       // bool muTrigger          = ev.t_bits[6];
       bool mumuTrigger        = ev.t_bits[2] || ev.t_bits[3]; 
       bool emuTrigger         = ev.t_bits[4] || ev.t_bits[5];
+      
 
+      // fill the total triggers before selection
+      //  'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v', itrig = 8 
+      // const int NTRIG = 8; 
+
+      // cout << ">>>> last trigger bit: " << ev.t_bits[trigs.size()-1] << endl; 
+      
+      for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	if (ev.t_bits[itrig]) {
+	  // n_trig_8_total += 1; 
+	  h_total->Fill(itrig+1);
+
+	  // if (itrig == 15 ) cout << ">>> last one triggered! " << endl; 
+	}
+      }
+
+      
       bool hasPhotonTrigger(false);
       float triggerPrescale(1.0),triggerThreshold(0);
       // bool runPhotonSelection(mctruthmode==22 || mctruthmode==111);
@@ -231,6 +268,7 @@ int main(int argc, char* argv[])
 	    }
 	}
 
+
       
       //
       // DERIVE WEIGHTS TO APPLY TO SAMPLE
@@ -241,12 +279,12 @@ int main(int argc, char* argv[])
       double TotalWeight_plus = 1.0;
       double TotalWeight_minus = 1.0;
       float puWeight(1.0);
-      if(isMC){
-        puWeight          = LumiWeights->weight(ev.ngenITpu);
-	weight            = puWeight;
-        TotalWeight_plus  = PuShifters[utils::cmssw::PUUP]->Eval(ev.ngenITpu);
-        TotalWeight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(ev.ngenITpu);
-      }
+      // if(isMC){
+      // 	puWeight          = LumiWeights->weight(ev.ngenITpu);
+      // 	weight            = puWeight;
+      //   TotalWeight_plus  = PuShifters[utils::cmssw::PUUP]->Eval(ev.ngenITpu);
+      //   TotalWeight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(ev.ngenITpu);
+      // }
 
       Hcutflow->Fill(1,1);
       Hcutflow->Fill(2,weight);
@@ -310,6 +348,7 @@ int main(int argc, char* argv[])
 	}
 
 
+
       //
       // LEPTON ANALYSIS
       //
@@ -322,18 +361,20 @@ int main(int argc, char* argv[])
 
 	  int lid=leptons[ilep].get("id");
 
+	  
+	  // cout << "here: " << lid << endl; exit(0); 
 	  //apply muon corrections
 	  if(abs(lid)==13)
 	    {
 	      passSoftMuon=false;
-	      if(muCor){
-		TLorentzVector p4(leptons[ilep].px(),leptons[ilep].py(),leptons[ilep].pz(),leptons[ilep].energy());
-		muCor->applyPtCorrection(p4 , lid<0 ? -1 :1 );
-		if(isMC) muCor->applyPtSmearing(p4, lid<0 ? -1 : 1, false);
-		muDiff -= leptons[ilep];
-		leptons[ilep].SetPxPyPzE(p4.Px(),p4.Py(),p4.Pz(),p4.E());
-		muDiff += leptons[ilep];
-	      }
+	      // if(muCor){
+	      // 	TLorentzVector p4(leptons[ilep].px(),leptons[ilep].py(),leptons[ilep].pz(),leptons[ilep].energy());
+	      // 	muCor->applyPtCorrection(p4 , lid<0 ? -1 :1 );
+	      // 	if(isMC) muCor->applyPtSmearing(p4, lid<0 ? -1 : 1, false);
+	      // 	muDiff -= leptons[ilep];
+	      // 	leptons[ilep].SetPxPyPzE(p4.Px(),p4.Py(),p4.Pz(),p4.E());
+	      // 	muDiff += leptons[ilep];
+	      //}
 	    }
 
 	  //no need for charge info any longer
@@ -411,7 +452,7 @@ int main(int argc, char* argv[])
       //JET/MET ANALYSIS
       //
       //add scale/resolution uncertainties and propagate to the MET
-      utils::cmssw::updateJEC(jets,jesCor,totalJESUnc,ev.rho,ev.nvtx,isMC);
+      //utils::cmssw::updateJEC(jets,jesCor,totalJESUnc,ev.rho,ev.nvtx,isMC);
       std::vector<LorentzVector> met=utils::cmssw::getMETvariations(recoMet[0],jets,selLeptons,isMC);
 
       //select the jets
@@ -478,18 +519,17 @@ int main(int argc, char* argv[])
       LorentzVector boson(0,0,0,0);
       if(!runPhotonSelection && selLeptons.size()==2)
 	{
- 	  for(size_t ilep=0; ilep<2; ilep++)
-	    {
-	      dilId *= selLeptons[ilep].get("id");
-	      int id(abs(selLeptons[ilep].get("id")));
-	      weight *= isMC ? lepEff.getLeptonEfficiency( selLeptons[ilep].pt(), selLeptons[ilep].eta(), id,  id ==11 ? "loose" : "loose" ).first : 1.0;
-	      boson += selLeptons[ilep];
-	    }
-     
-	  //check the channel
-	  if( abs(dilId)==121 && eeTrigger)   chTags.push_back("ee");
-	  if( abs(dilId)==169 && mumuTrigger) chTags.push_back("mumu"); 
-	  if( abs(dilId)==143 && emuTrigger) chTags.push_back("emu"); 
+ 	  // for(size_t ilep=0; ilep<2; ilep++)
+	  //   {
+	  //     dilId *= selLeptons[ilep].get("id");
+	  //     int id(abs(selLeptons[ilep].get("id")));
+	  // weight *= isMC ? lepEff.getLeptonEfficiency( selLeptons[ilep].pt(), selLeptons[ilep].eta(), id,  id ==11 ? "loose" : "loose" ).first : 1.0;
+	  //     boson += selLeptons[ilep];
+	  //   }
+     	  // //check the channel
+	  // if( abs(dilId)==121 && eeTrigger)   chTags.push_back("ee");
+	  // if( abs(dilId)==169 && mumuTrigger) chTags.push_back("mumu"); 
+	  // if( abs(dilId)==143 && emuTrigger) chTags.push_back("emu"); 
 	}
       else{
 	if(hasPhotonTrigger && selPhotons.size()) {
@@ -509,6 +549,10 @@ int main(int argc, char* argv[])
 	tags.push_back( chTags[ich]+evCat );
       }
 
+      for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+      }
+      
       //
       // BASELINE SELECTION
       //
@@ -517,6 +561,22 @@ int main(int argc, char* argv[])
       bool passThirdLeptonVeto( selLeptons.size()==2 && extraLeptons.size()==0 );
       bool passBtags(nbtags==0);
       bool passMinDphijmet( njets==0 || mindphijmet>0.5);
+
+
+      // passed photon + jet trigger study
+
+      // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
+
+      
+      // if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
+      // if ( true) {
+
+      // 	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+      // 	  // n_trig_8_pass += 1; 
+      // 	  if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+      // 	}
+      // }
+
       if(runPhotonSelection)
 	{
 	  passMass=hasPhotonTrigger;
@@ -627,7 +687,11 @@ int main(int argc, char* argv[])
 		    mon.fillHisto( "mtNM1",icat,mt,iweight,true);
 		    mon.fillHisto( "balanceNM1",icat,met[0].pt()/iboson.pt(),iweight);
 		    mon.fillHisto( "axialmetNM1",icat,axialMet,iweight);
+
+
+
 		  }
+
 		  if(mt>500){
 		    mon.fillHisto( "metNM1",icat,met[0].pt(),iweight,true);
 		  }
@@ -809,19 +873,45 @@ int main(int argc, char* argv[])
   printf("\n"); 
   file->Close();
   
+  // Make efficiency histo
+
+  TEfficiency* trig_eff = new TEfficiency("eff", ";Trigger Paths;Efficiency", 
+					  trigs.size(), 0, trigs.size());
+  for (size_t itrig = 0; itrig<trigs.size(); itrig++) {
+    int iTotal = h_total->GetBinContent(itrig+1); 
+    int iPass = h_pass->GetBinContent(itrig+1); 
+    if (iPass  == 0 ) continue; 
+    trig_eff->SetTotalEvents(itrig+1, iTotal); 
+    trig_eff->SetPassedEvents(itrig+1, iPass); 
+
+    printf("Trig eff %s : %f \n", trigs[itrig].c_str(), 
+	   trig_eff->GetEfficiency(itrig+1)); 
+
+    // trig_eff->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
+
+  }
+   
   //##############################################
   //########     SAVING HISTO TO FILE     ########
   //##############################################
   //save control plots to file
   outUrl += "/";
-  // outUrl += outFileUrl + ".root";
+  outUrl += outFileUrl + ".root";
   printf("Results save in %s\n", outUrl.Data());
   
   //save all to the file
   TFile *ofile=TFile::Open(outUrl, "recreate");
   mon.Write();
+
+  h_total->Write(); 
+  h_pass->Write(); 
+  // trig_eff->Write(); 
+
   ofile->Close();
 
+  // cout << "N tot = " << n_trig_8_total 
+  //      << " ,  N pass = " << n_trig_8_pass << endl; 
+  
   // if(outTxtFile)fclose(outTxtFile);
 }  
 

@@ -4,3 +4,7 @@
 <export>
 	<lib name="1"/>
 </export>
+
+<!-- <Flags CXXFLAGS="-O0 -g -DDEBUG"/> -->
+<Flags CXXFLAGS="-g"/>
+  
