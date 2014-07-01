@@ -24,7 +24,28 @@ runProcess = cms.PSet(
         'HLT_Photon300_NoHE_v1_v',
         'HLT_Ele27_WP80_v',
         'HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v',
-        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v'
+
+        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v', 
+        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_PFMET40_v',
+        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_PFMET40_v',
+        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_PFMET40_v',
+        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_PFMET40_v',
+        'HLT_Photon135_PFMET40_v',
+        'HLT_Photon150_PFMET40_v',
+        'HLT_Photon160_PFMET40_v',
+        'HLT_Photon250_NoHE_PFMET40_v',
+        'HLT_Photon300_NoHE_PFMET40_v',
+
+        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_VBF_v',
+        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_VBF_v',
+        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_VBF_v',
+        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_VBF_v',
+        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_VBF_v',
+        'HLT_Photon135_VBF_v',
+        'HLT_Photon150_VBF_v',
+        'HLT_Photon160_VBF_v',
+        'HLT_Photon250_NoHE_VBF_v',
+        'HLT_Photon300_NoHE_VBF_v',
     ),	
 )
 

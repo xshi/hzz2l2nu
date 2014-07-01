@@ -59,7 +59,16 @@ inputList = cms.untracked.vstring(
 #     filedir + 'JME-Summer12DR53X-00171_9_1_IgN.root',
 #     filedir + 'JME-Summer12DR53X-00171_10_1_Re3.root'
 
-filedir + 'JME-Summer12DR53X-00171_1_1_Dum.root'
+filedir + 'JME-Summer12DR53X-00171_1_1_Dum.root',
+filedir +  'JME-Summer12DR53X-00171_2_1_Apc.root', 
+filedir +  'JME-Summer12DR53X-00171_3_1_QgJ.root', 
+filedir +  'JME-Summer12DR53X-00171_4_1_Bqi.root', 
+filedir +  'JME-Summer12DR53X-00171_5_1_jND.root', 
+filedir +  'JME-Summer12DR53X-00171_6_1_Iob.root', 
+filedir +  'JME-Summer12DR53X-00171_7_1_xsy.root', 
+filedir +  'JME-Summer12DR53X-00171_8_1_dOU.root', 
+filedir +  'JME-Summer12DR53X-00171_9_1_sGE.root', 
+filedir +  'JME-Summer12DR53X-00171_10_1_DF6.root'
 )
 
 #inputList = cms.untracked.vstring('file:/home/shi210/disk/1/JME-Summer12DR53X-00171.root')
@@ -76,8 +85,9 @@ except:
     storeAllPF=True
     print 'Will store all PF candidates?' + str(storeAllPF)
     
-#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+
 
 try:
     print 'EDM output set to %s'%outFile
@@ -237,9 +247,9 @@ process.pfType1CorrectedMet.srcType1Corrections = cms.VInputTag( cms.InputTag('p
 
 
 #the analyzer
-print'here'
-#from UserCode.llvv_fwk.dataAnalyzer_cfi import *
-from UserCode.llvv_fwk.dataAnalyzer_new_cfi import *
+#print'here'
+from UserCode.llvv_fwk.dataAnalyzer_cfi import *
+
 try:
     if runDijetsAnalysis :
         process.dataAnalyzer = dijetAnalyzer.clone()

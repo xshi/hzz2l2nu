@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   //check run range to compute scale factor (if not all entries are used)
   const Int_t totalEntries= evSummaryHandler.getEntries();
   
-  cout << "total entries: " << totalEntries << endl; 
+  // cout << "total entries: " << totalEntries << endl; 
 
   //MC normalization (to 1/pb)
   float cnorm=1.0;
@@ -549,9 +549,9 @@ int main(int argc, char* argv[])
 	tags.push_back( chTags[ich]+evCat );
       }
 
-      for(size_t itrig=0; itrig<trigs.size(); itrig++) {
-	if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
-      }
+      // for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+      // 	if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+      // }
       
       //
       // BASELINE SELECTION
@@ -562,26 +562,19 @@ int main(int argc, char* argv[])
       bool passBtags(nbtags==0);
       bool passMinDphijmet( njets==0 || mindphijmet>0.5);
 
-
-      // passed photon + jet trigger study
-
-      // if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet )
-
-      
-      // if ( passQt) { //  && passThirdLeptonVeto ) // && passBtags && passMinDphijmet )
-      // if ( true) {
-
-      // 	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
-      // 	  // n_trig_8_pass += 1; 
-      // 	  if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
-      // 	}
-      // }
-
       if(runPhotonSelection)
 	{
 	  passMass=hasPhotonTrigger;
 	  passThirdLeptonVeto=(selLeptons.size()==0 && extraLeptons.size()==0);
 	}
+
+
+      // passed photon + jet trigger study
+      if ( passQt && passThirdLeptonVeto && passBtags && passMinDphijmet) {
+	for(size_t itrig=0; itrig<trigs.size(); itrig++) {
+	  if (ev.t_bits[itrig]) h_pass->Fill(itrig+1);
+	}
+      }
 
       mon.fillHisto("eventflow",  tags,0,weight);
       mon.fillHisto("nvtxraw",  tags,ev.nvtx,weight/puWeight);
@@ -880,7 +873,7 @@ int main(int argc, char* argv[])
   for (size_t itrig = 0; itrig<trigs.size(); itrig++) {
     int iTotal = h_total->GetBinContent(itrig+1); 
     int iPass = h_pass->GetBinContent(itrig+1); 
-    if (iPass  == 0 ) continue; 
+    // if (iPass  == 0 ) continue; 
     trig_eff->SetTotalEvents(itrig+1, iTotal); 
     trig_eff->SetPassedEvents(itrig+1, iPass); 
 
@@ -888,7 +881,6 @@ int main(int argc, char* argv[])
 	   trig_eff->GetEfficiency(itrig+1)); 
 
     // trig_eff->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
-
   }
    
   //##############################################
@@ -905,7 +897,7 @@ int main(int argc, char* argv[])
 
   h_total->Write(); 
   h_pass->Write(); 
-  // trig_eff->Write(); 
+  trig_eff->Write(); 
 
   ofile->Close();
 
