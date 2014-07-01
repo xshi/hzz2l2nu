@@ -877,10 +877,11 @@ int main(int argc, char* argv[])
     trig_eff->SetTotalEvents(itrig+1, iTotal); 
     trig_eff->SetPassedEvents(itrig+1, iPass); 
 
-    printf("Trig eff %s : %f \n", trigs[itrig].c_str(), 
-	   trig_eff->GetEfficiency(itrig+1)); 
+    printf(" %s : %.2f +- %.2f \n", trigs[itrig].c_str(), 
+	   trig_eff->GetEfficiency(itrig+1),
+	   trig_eff->GetEfficiencyErrorUp(itrig+1) ); 
 
-    // trig_eff->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
+    h_total->GetXaxis()->SetBinLabel(itrig+1,trigs[itrig].c_str()) ; 
   }
    
   //##############################################
