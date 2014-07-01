@@ -74,6 +74,7 @@ void trigEff(TString inputFile) {
 
   eff->Draw();
   c->Update();
+
   
   //open the file and get events tree
   // DataEventSummaryHandler evSummaryHandler;
