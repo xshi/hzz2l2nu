@@ -4,27 +4,33 @@
 // 
 
 #include <iostream>
-#include <map> 
 #include <string> 
-// #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 int main(int argc, char** argv) {
   std::cout << "Calculatine trigger rate ... " << std::endl;
 
-  std::map <std::string, double> path_rate;  
+  std::ifstream in;
+  in.open("ref_rate.dat"); 
 
-  // Rates taken from run 1917188, LS32-40
-  path_rate["HLT_Photon135"]=7.3;
-  path_rate["HLT_Photon22_R9Id90_HE10_Iso40_EBOnly"]= 1.97;   
-  path_rate["HLT_Photon36_R9Id90_HE10_Iso40_EBOnly"]= 0.95;
-  path_rate["HLT_Photon50_R9Id90_HE10_Iso40_EBOnly"]= 0.58;
-  path_rate["HLT_Photon75_R9Id90_HE10_Iso40_EBOnly"]= 0.33;
-  path_rate["HLT_Photon90_R9Id90_HE10_Iso40_EBOnly"]= 0.39;
-  path_rate["HLT_Photon135"]= 7.34;
-  path_rate["HLT_Photon150"]= 4.59;
-  path_rate["HLT_Photon160"]= 3.33;
-  path_rate["HLT_Photon250_NoHE"]= 0.80;
-  path_rate["HLT_Photon300_NoHE"]= 0.80;
+  std::string path;
+  double rate;
+  double prescale;
+
+  std::string line;
+  int nlines = 0;
+
+  while (getline(in, line)) {
+    std::istringstream iss(line);
+    if ( line.find("#") == 0 ) continue; 
+    if (!(iss >> path >> rate >> prescale )) break; 
+    if (!in.good()) break;
+    std::cout << path << ": " << rate*prescale << std::endl; 
+    nlines ++; 
+  }
+
+  std::cout << "Total of " << nlines << " found" << std::endl;
 
   return 0 ;
 }
