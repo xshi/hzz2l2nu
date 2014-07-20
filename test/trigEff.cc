@@ -4,6 +4,7 @@
 // 
 
 #include <iostream>
+#include <algorithm>
 #include <TROOT.h>
 #include <TSystem.h>
 #include <TString.h>
@@ -83,7 +84,7 @@ void trigEff(TString inputFile) {
 }
 
 
-// #include <algorithm>
+
 
 char* get_option(char ** begin, char ** end, const std::string & option){
   char ** itr = std::find(begin, end, option);
