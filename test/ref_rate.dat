@@ -1,0 +1,12 @@
+# https://cmswbm.web.cern.ch/cmswbm/cmsdb/servlet/TriggerMode?KEY=l1_hlt_collisions_2012_ECALtrans
+# Path Rate[Hz] Prescale   
+HLT_Photon22_R9Id90_HE10_Iso40_EBOnly  1.97  180
+HLT_Photon36_R9Id90_HE10_Iso40_EBOnly  0.95  60 
+HLT_Photon50_R9Id90_HE10_Iso40_EBOnly  0.58  30 
+HLT_Photon75_R9Id90_HE10_Iso40_EBOnly  0.33  10
+HLT_Photon90_R9Id90_HE10_Iso40_EBOnly  0.39  5
+HLT_Photon135  7.34 1 
+HLT_Photon150  4.59 1
+HLT_Photon160  3.33 1
+HLT_Photon250_NoHE  0.80 1
+HLT_Photon300_NoHE  0.80 1
