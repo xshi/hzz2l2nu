@@ -22,6 +22,7 @@ class HLTPhotonConversionFilter : public HLTFilter {
       
 
    private:
+      // edm::InputTag candTag_; 
       edm::InputTag photonTag_; 
       edm::InputTag electronTag_; 
 };

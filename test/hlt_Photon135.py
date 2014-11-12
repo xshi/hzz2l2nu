@@ -5677,8 +5677,9 @@ process.hltPhoton135HEFilter = cms.EDFilter( "HLTEgammaGenericFilter",
 
 process.hltPhotonConversionFilter = cms.EDFilter( "HLTPhotonConversionFilter",
     saveTags = cms.bool( False ),
-    photonTag = cms.InputTag( "photons" ),
-    electronTag = cms.InputTag( "gsfElectrons" )
+    candTag = cms.InputTag( "hltPhoton135HEFilter" ),
+    #photonTag = cms.InputTag( "photons" ),
+    #electronTag = cms.InputTag( "gsfElectrons" )
 )
 
 

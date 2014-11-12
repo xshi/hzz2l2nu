@@ -5986,6 +5986,16 @@ process.HLTL1SeededGsfElectronSequence = cms.Sequence( process.hltL1SeededCkfTra
 process.HLT_Photon135_v7 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG30 + process.hltPrePhoton135 + process.HLTSinglePhoton135Sequence + process.HLTEndSequence )
 process.HLT_Ele80_CaloIdVT_GsfTrkIdT_v2 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG20ORL1SingleEG22 + process.hltPreEle80CaloIdVTGsfTrkIdT + process.HLTEle80CaloIdVTSequence + process.HLTL1SeededGsfElectronSequence + process.hltEle80CaloIdVTGsfTrkIdTDEtaFilter + process.hltEle80CaloIdVTGsfTrkIdTDPhiFilter + process.HLTEndSequence )
 
+process.hltPhotonConversionFilter = cms.EDFilter( "HLTPhotonConversionFilter",
+    saveTags = cms.bool( False ),
+    photonTag = cms.InputTag( "hltPhoton135HEFilter" ),
+    electronTag = cms.InputTag( "hltL1SeededGsfElectrons" )
+)
+
+
+process.HLT_Photon135_Conversion_v7 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleEG30 + process.hltPrePhoton135 + process.HLTSinglePhoton135Sequence + 
+process.hltPhotonConversionFilter +  process.HLTEndSequence )
+
 
 process.source = cms.Source( "PoolSource",
     fileNames = cms.untracked.vstring(
