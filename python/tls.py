@@ -14,7 +14,13 @@ import tls
 
 
 def print_usage():
-    print("./tls.py -h")
+    print('''
+Usage: 
+    ./tls.py [arg]
+
+Arguments: 
+    -h                     Print this help message and exit.  
+    hlt_get_passed_evts    Get the passed event number for HLT menus.''')
 
     
 def main():
@@ -25,7 +31,8 @@ def main():
     function = getattr(tls, args[0])
     function(args[1:])
 
-
+def hlt_get_passed_evts(args):
+    print args 
 
 
 if __name__ == '__main__':
