@@ -1,0 +1,10 @@
+<bin file="preselection.cpp" name="preselHZZ2l2nu">
+	<use name="HiggsAnalysis/hzz2l2nu"/>
+	<use name="root"/>
+</bin>
+
+<bin file="hzz2l2nuRun.cc" name="hzz2l2nuRun">
+	<use name="UserCode/llvv_fwk"/>
+	<use name="root"/>
+</bin>
+
