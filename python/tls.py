@@ -34,7 +34,6 @@ def main():
 
     
 def hlt_get_passed_evts(args):
-    samples = ['QCD_Pt-30to50_Tune4C_13TeV_pythia8']
     hltpaths = [
         'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
         'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
@@ -53,7 +52,8 @@ def hlt_get_passed_evts(args):
         'HLT_Photon250_NoHE_v1',
         'HLT_Photon300_NoHE_v1',
     ]
-    for sample in samples:
+
+    for sample in args:
         resdir = os.path.join(os.getcwd(), sample, 'res')
         files = get_files_in_dir(resdir, pattern='.stdout') 
         print '\n  %s \n' % sample
