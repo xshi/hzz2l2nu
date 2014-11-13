@@ -38,14 +38,35 @@ def hlt_get_passed_evts(args):
     hltpaths = [
         'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
         'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon120_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon120_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+        'HLT_Photon135_PFMET40_v1',
+        'HLT_Photon135_VBF_v1',
+        'HLT_Photon250_NoHE_v1',
+        'HLT_Photon300_NoHE_v1',
     ]
     for sample in samples:
         resdir = os.path.join(os.getcwd(), sample, 'res')
         files = get_files_in_dir(resdir, pattern='.stdout') 
-        print len(files)
-        get_total_passed_evts(resdir, files, hltpaths)
-        
-    
+        print '\n  %s \n' % sample
+        hltpaths_dict = get_total_passed_evts(resdir, files, hltpaths)
+        print 'HLT Path                                      Run     Passed'
+        print '------------------------------------------------------------'
+        for hltpath in hltpaths:
+            Run = hltpaths_dict[hltpath]['Run']
+            Passed = hltpaths_dict[hltpath]['Passed']
+            print '%s  %s  %s' %(hltpath, Run, Passed)
+        print '------------------------------------------------------------'
+
+
 #----------------------------------------------------------------
 #   Supporting function 
 #----------------------------------------------------------------
@@ -78,7 +99,8 @@ def get_total_passed_evts(path, files, hltpaths):
         f = StdoutFile(os.path.join(path, fi))
         f.get_total_passed_evts(hltpaths_dict)
 
-    print hltpaths_dict 
+    return hltpaths_dict
+
 
 def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
     if test:
