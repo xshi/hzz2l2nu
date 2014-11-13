@@ -11,9 +11,9 @@ __copyright__ = "Copyright (c) Xin Shi"
 import os
 import sys
 import subprocess
-import json 
+import json
+import math 
 import tls
-
 
 def print_usage():
     print('''
@@ -22,7 +22,9 @@ Usage:
 
 Arguments: 
     -h                     Print this help message and exit.  
-    hlt_get_passed_evts    Get the passed event number for HLT menus.''')
+    hlt_get_passed_evts    Get the passed event number for HLT paths.
+    hlt_get_rates          Get the rates for the HLT paths.
+''')
 
     
 def main():
@@ -35,25 +37,7 @@ def main():
 
     
 def hlt_get_passed_evts(args):
-    hltpaths = [
-        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon120_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
-        'HLT_Photon120_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
-        'HLT_Photon135_PFMET40_v1',
-        'HLT_Photon135_VBF_v1',
-        'HLT_Photon250_NoHE_v1',
-        'HLT_Photon300_NoHE_v1',
-    ]
-
+    from dat import hltpaths 
     for sample in args:
         resdir = os.path.join(os.getcwd(), sample, 'res')
         files = get_files_in_dir(resdir, pattern='.stdout') 
@@ -71,8 +55,23 @@ def hlt_get_passed_evts(args):
         json.dump(hltpaths_dict, db)
         db.close()
         sys.stdout.write('Saved as %s \n' %dbfile)
-        
 
+
+def hlt_get_rates(args):
+    from dat import hltpaths, crossSections13TeV, photon_jet_samples 
+    for hltpath in hltpaths:
+        sys.stdout.write('\n %s \n' % hltpath )
+        for sample in photon_jet_samples.keys():
+            xsec = crossSections13TeV[sample]*1e-36 
+            dbfile = '%s.json' % photon_jet_samples[sample]
+            db = open(dbfile)
+            hltpaths_dict = json.load(db)
+            db.close()
+            nevts = hltpaths_dict[hltpath]['Run']
+            count = hltpaths_dict[hltpath]['Passed']
+            print xsec, nevts, count 
+            sys.exit()
+    
 #----------------------------------------------------------------
 #   Supporting function 
 #----------------------------------------------------------------
@@ -134,6 +133,16 @@ def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
         os.chdir(cwd)
 
     return stdout
+
+
+def Rate(count,xsec,nevts):
+    rate = xsec*ilumi*(count/nevts)
+    return rate
+
+
+def RateErr(count,xsec,nevts):
+    rateerr = ((xsec * ilumi)/nevts) * math.sqrt(count)
+    return rateerr
 
 
 # ------------------------------------------------------------
