@@ -35,7 +35,10 @@ def main():
     
 def hlt_get_passed_evts(args):
     samples = ['QCD_Pt-30to50_Tune4C_13TeV_pythia8']
-    hltpaths = ['HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1']
+    hltpaths = [
+        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_PFMET40_v1',
+        'HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_VBF_v1',
+    ]
     for sample in samples:
         resdir = os.path.join(os.getcwd(), sample, 'res')
         files = get_files_in_dir(resdir, pattern='.stdout') 
@@ -67,13 +70,15 @@ def get_files_in_dir(path, pattern=None):
 
 
 def get_total_passed_evts(path, files, hltpaths):
-    ntot = 0
-    npas = 0
+    hltpaths_dict = {}
+    for hltpath in hltpaths: 
+        hltpaths_dict[hltpath] = {'Run': 0, 'Passed': 0}
+
     for fi in files:
         f = StdoutFile(os.path.join(path, fi))
-        print f.data
-        sys.exit()
-    
+        f.get_total_passed_evts(hltpaths_dict)
+
+    print hltpaths_dict 
 
 def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
     if test:
@@ -102,6 +107,7 @@ def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
 
     return stdout
 
+
 # ------------------------------------------------------------
 # Classes 
 # ------------------------------------------------------------
@@ -116,25 +122,27 @@ class StdoutFile(object):
             self.data.append(line)
         fi.close()
         
-    def parse(self):
-        "parse log file"
-        line_no = -1
-        found_stream_event = False
-        start_lumi_info = False
+    def get_total_passed_evts(self, hltpaths_dict):
+        "Get the total and passed evetns for HLT paths"
+
         for line in self.data:
-            line_no += 1
             line = line.strip()
-            if 'processed' in line:
-                self.processed = line.split(' ')[1]
-                
-            if 'skimmed' in line:
-                self.skimmed = line.split(' ')[1]
+            for hltpath in hltpaths_dict.keys(): 
+                if hltpath in line:
+                    items = line.split()
+                    try: 
+                        nrun = int(items[3])
+                    except ValueError:
+                        continue
 
-            if 'selected' in line:
-                self.selected = line.split(' ')[1]
+                    npassed = int(items[4])
+                    Run = hltpaths_dict[hltpath]['Run']
+                    Passed = hltpaths_dict[hltpath]['Passed']
 
-            if 'duration' in line:
-                self.duration = line.replace('duration ', '')
+                    hltpaths_dict[hltpath]['Run'] = Run + nrun
+                    hltpaths_dict[hltpath]['Passed'] = Passed + npassed
+
+        return hltpaths_dict 
 
 
 if __name__ == '__main__':
