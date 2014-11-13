@@ -11,6 +11,7 @@ __copyright__ = "Copyright (c) Xin Shi"
 import os
 import sys
 import subprocess
+import json 
 import tls
 
 
@@ -65,7 +66,12 @@ def hlt_get_passed_evts(args):
             Passed = hltpaths_dict[hltpath]['Passed']
             print '%s  %s  %s' %(hltpath, Run, Passed)
         print '------------------------------------------------------------'
-
+        dbfile = '%s.json' %sample
+        db = open(dbfile, 'w')
+        json.dump(hltpaths_dict, db)
+        db.close()
+        sys.stdout.write('Saved as %s \n' %dbfile)
+        
 
 #----------------------------------------------------------------
 #   Supporting function 
