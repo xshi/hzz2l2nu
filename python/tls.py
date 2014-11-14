@@ -63,19 +63,27 @@ def hlt_get_rates(args):
     sys.stdout.write('Calculating ilumi = %s \n' %ilumi )
     for hltpath in hltpaths:
         sys.stdout.write('\n %s \n' % hltpath )
-        for sample in photon_jet_samples.keys():
-            xsec = crossSections13TeV[sample]*1e-36 
-            dbfile = '%s.json' % photon_jet_samples[sample]
+        rates = []
+        err = [] 
+        sys.stdout.write('Sample  nevts  count xsec rate err \n')
+        for sample in photon_jet_samples:
+            xsec = crossSections13TeV[sample][0]*1e-36 
+            dbfile = '%s.json' % crossSections13TeV[sample][1]
             db = open(dbfile)
             hltpaths_dict = json.load(db)
             db.close()
             nevts = hltpaths_dict[hltpath]['Run']
             count = hltpaths_dict[hltpath]['Passed']
-            print xsec, nevts, count
             rate, rateerr = calc_rate(ilumi, count, xsec, nevts)
             rateerrsq = pow(rateerr,2)
-            print rate, " +/- ",  rateerr  
-            sys.exit()
+            sys.stdout.write('%s %s %s %s %s %s \n' % (
+                sample, nevts, count, xsec, rate, rateerr))
+            rates.append(rate)
+            err.append(rateerrsq)
+        tot_rate = sum(rates)
+        tot_err = math.sqrt(sum(err))
+        sys.stdout.write('The total rate is %s +- %s\n' %(tot_rate, tot_err))
+
     
 #----------------------------------------------------------------
 #   Supporting function 
