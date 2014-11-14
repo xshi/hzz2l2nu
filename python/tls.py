@@ -58,7 +58,9 @@ def hlt_get_passed_evts(args):
 
 
 def hlt_get_rates(args):
-    from dat import hltpaths, crossSections13TeV, photon_jet_samples 
+    from dat import hltpaths, crossSections13TeV, photon_jet_samples
+    ilumi = 1.4e34
+    sys.stdout.write('Calculating ilumi = %s \n' %ilumi )
     for hltpath in hltpaths:
         sys.stdout.write('\n %s \n' % hltpath )
         for sample in photon_jet_samples.keys():
@@ -69,12 +71,21 @@ def hlt_get_rates(args):
             db.close()
             nevts = hltpaths_dict[hltpath]['Run']
             count = hltpaths_dict[hltpath]['Passed']
-            print xsec, nevts, count 
+            print xsec, nevts, count
+            rate, rateerr = calc_rate(ilumi, count, xsec, nevts)
+            rateerrsq = pow(rateerr,2)
+            print rate, " +/- ",  rateerr  
             sys.exit()
     
 #----------------------------------------------------------------
 #   Supporting function 
 #----------------------------------------------------------------
+
+def calc_rate(ilumi, count, xsec, nevts):
+    rate = xsec*ilumi*(count/float(nevts))
+    rateerr = ((xsec * ilumi)/float(nevts)) * math.sqrt(count)
+    return rate, rateerr 
+
 
 def get_files_in_dir(path, pattern=None):
     files = []
@@ -134,15 +145,6 @@ def proc_cmd(cmd, test=False, verbose=1, procdir=None, shell=False):
 
     return stdout
 
-
-def Rate(count,xsec,nevts):
-    rate = xsec*ilumi*(count/nevts)
-    return rate
-
-
-def RateErr(count,xsec,nevts):
-    rateerr = ((xsec * ilumi)/nevts) * math.sqrt(count)
-    return rateerr
 
 
 # ------------------------------------------------------------
